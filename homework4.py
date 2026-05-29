@@ -348,10 +348,3 @@ for word in text.split():
         word_lengths[cleaned_word] = len(cleaned_word)
 
 print(word_lengths)
-
-
-    most_frequent = [word for word, count in word_counts.items() if count == max_count]
-
-    print(f"\nყველაზე ხშირი სიტყვა (გამეორდა {max_count}-ჯერ):")
-    for word in most_frequent:
-        print(f"-> {word}")
