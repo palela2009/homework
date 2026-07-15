@@ -10,17 +10,18 @@ class RegistrationSimulator:
         }
 
     def register_name(self, name):
-        if name.isdigit():
-            return "შემოყვანილია რიცხვითი მნიშვნელობა, შემოიტანეთ მხოლოდ string პატარა რეგისტრში"
+        if not name:
+            return "შეცდომა: სახელი არ უნდა იყოს ცარიელი!"
 
-        is_ascii_letter = all(char in string.ascii_letters for char in name)
+        if any(char.isdigit() for char in name):
+            return "შეცდომა: შემოყვანილია რიცხვი ან შერეული ციფრები. შეიყვანეთ მხოლოდ ასოები!"
 
-        if not is_ascii_letter:
-            is_georgian = all('\u10a0' <= char <= '\u10ff' for char in name)
-            if is_georgian or any(char.isalpha() for char in name):
-                return "ეს არის სხვა ენა. გთხოვთ გამოიყენოთ ლათინური ასოები"
-            else:
-                return "შემოყვანილია სიმბოლოები, შემოიტანეთ მხოლოდ string პატარა რეგისტრში"
+        if any(not char.isalnum() for char in name):
+            return "შეცდომა: შემოყვანილია სიმბოლოები. შეიყვანეთ მხოლოდ ასოები!"
+
+        is_latin = all(char in string.ascii_letters for char in name)
+        if not is_latin:
+            return "ეს არის სხვა ენა. გთხოვთ გამოიყენოთ ლათინური ასოები"
 
         if not name.islower():
             return "შემოიტანეთ მხოლოდ string პატარა რეგისტრში"
@@ -29,21 +30,21 @@ class RegistrationSimulator:
         return self.database
 
 
-def main():
-    simulator = RegistrationSimulator()
-    print("--- რეგისტრაციის სისტემა ---")
-    name_input = input("შეიყვანეთ თქვენი სახელი (ლათინური პატარა ასოებით): ").strip()
+    def main():
+        simulator = RegistrationSimulator()
+        print("--- რეგისტრაციის სისტემა ---")
+        name_input = input("შეიყვანეთ თქვენი სახელი (ლათინური პატარა ასოებით): ").strip()
 
-    result = simulator.register_name(name_input)
+        result = simulator.register_name(name_input)
 
-    if isinstance(result, dict):
-        print("\nრეგისტრაცია წარმატებით დასრულდა!")
-        print(f"ელ-ფოსტა: {result['email']}")
-        print(f"სახელი: {result['name']}")
-        print(f"ზედმეტსახელი: {result['username']}")
-        print(f"პაროლი: {result['password']}")
-    else:
-        print(result)
+        if isinstance(result, dict):
+            print("\nრეგისტრაცია წარმატებით დასრულდა!")
+            print(f"ელ-ფოსტა: {result['email']}")
+            print(f"სახელი: {result['name']}")
+            print(f"ზედმეტსახელი: {result['username']}")
+            print(f"პაროლი: {result['password']}")
+        else:
+            print(result)
 
 
 if __name__ == "__main__":
