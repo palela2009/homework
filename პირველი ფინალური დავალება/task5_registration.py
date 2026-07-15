@@ -2,11 +2,12 @@ import string
 
 
 class RegistrationSimulator:
+
     def __init__(self):
         self.database = {
             "email": "user@mail.com",
             "username": "george777",
-            "password": "password123"
+            "password": "password123",
         }
 
     def register_name(self, name):
@@ -30,21 +31,23 @@ class RegistrationSimulator:
         return self.database
 
 
-    def main():
-        simulator = RegistrationSimulator()
-        print("--- რეგისტრაციის სისტემა ---")
-        name_input = input("შეიყვანეთ თქვენი სახელი (ლათინური პატარა ასოებით): ").strip()
+def main():
+    simulator = RegistrationSimulator()
+    print("--- რეგისტრაციის სისტემა ---")
+    name_input = input(
+        "შეიყვანეთ თქვენი სახელი (ლათინური პატარა ასოებით): "
+    ).strip()
 
-        result = simulator.register_name(name_input)
+    result = simulator.register_name(name_input)
 
-        if isinstance(result, dict):
-            print("\nრეგისტრაცია წარმატებით დასრულდა!")
-            print(f"ელ-ფოსტა: {result['email']}")
-            print(f"სახელი: {result['name']}")
-            print(f"ზედმეტსახელი: {result['username']}")
-            print(f"პაროლი: {result['password']}")
-        else:
-            print(result)
+    if isinstance(result, dict):
+        print("\nრეგისტრაცია წარმატებით დასრულდა!")
+        print(f"ელ-ფოსტა: {result['email']}")
+        print(f"სახელი: {result['name']}")
+        print(f"ზედმეტსახელი: {result['username']}")
+        print(f"პაროლი: {result['password']}")
+    else:
+        print(result)
 
 
 if __name__ == "__main__":
