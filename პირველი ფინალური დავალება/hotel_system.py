@@ -1,4 +1,6 @@
 import logging
+from flask import Flask, render_template, request
+
 
 logging.basicConfig(
     filename="hotel_bookings.log",
@@ -6,6 +8,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     encoding="utf-8"
 )
+
 
 class Room:
     def __init__(self, room_number: int, room_type: str, price_per_night: float, max_guests: int):
@@ -52,7 +55,7 @@ class Customer:
 
     def show_booking_summary(self) -> str:
         rooms_str = ", ".join([str(r.room_number) for r in self.booked_rooms])
-        return f"მომხმარებელი: {self.name} | ბიუჯეტი: {self.budget}GEL | დაჯავშნილი: [{rooms_str}] | ქულები: {self.reward_points}"
+        return f"მომხმარებელი: {self.name} | ბიუჯეტი: {self.budget}GEL | დაჯავშნილი ოთახები: [{rooms_str}] | ქულები: {self.reward_points}"
 
 
 class Hotel:
@@ -104,3 +107,48 @@ class Hotel:
                 logging.info(log_message)
                 return True
         return False
+
+
+
+app = Flask(__name__)
+
+
+hotel = Hotel("Grand Palace")
+hotel.add_room_to_hotel(Room(101, "Single", 100.0, 1))
+hotel.add_room_to_hotel(Room(102, "Double", 180.0, 2))
+hotel.add_room_to_hotel(Room(103, "Suite", 300.0, 4))
+
+customer = Customer("გიორგი", 1000.0)
+
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    status_message = "სისტემის სტატუსი: მზად არის დასაჯავშნად."
+
+    if request.method == "POST":
+        room_type = request.form.get("room_type")
+        try:
+            days = int(request.form.get("days", 1))
+            budget = float(request.form.get("budget", 0))
+            customer.budget = budget
+        except ValueError:
+            status_message = "შეცდომა: შეიყვანეთ სწორი რიცხვები!"
+            return render_template("index.html", hotel=hotel, customer=customer, status_message=status_message)
+
+        available_rooms = hotel.show_available_rooms(room_type)
+
+        if not available_rooms:
+            status_message = f"სამწუხაროდ, {room_type} ტიპის თავისუფალი ოთახი აღარ არის!"
+        else:
+            selected_room = available_rooms[0]
+            success = hotel.book_room_for_customer(customer, selected_room.room_number, days)
+            if success:
+                status_message = f"წარმატება! დაჯავშნეთ ოთახი {selected_room.room_number}. ფასი: {selected_room.calculate_price(days)} GEL."
+            else:
+                status_message = f"შეცდომა: არასაკმარისი ბიუჯეტი! ოთახის ღირებულებაა {selected_room.calculate_price(days)} GEL, თქვენ გაქვთ მხოლოდ {customer.budget} GEL."
+
+    return render_template("index.html", hotel=hotel, customer=customer, status_message=status_message)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

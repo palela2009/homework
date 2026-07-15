@@ -79,6 +79,11 @@
             font-weight: bold;
         }
 
+        .status-booked {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
         .form-group {
             margin-bottom: 15px;
         }
@@ -119,6 +124,15 @@
             border: 1px solid #bbf7d0;
             border-radius: 4px;
             color: #166534;
+            font-weight: bold;
+        }
+
+        .user-info {
+            background-color: #eff6ff;
+            border-left: 5px solid #2563eb;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
         }
 
         footer {
@@ -146,64 +160,64 @@
 
     <main>
         <section id="hotel-info">
-            <h1>სასტუმრო "Grand Palace"</h1>
-            <p>კეთილი იყოს თქვენი მობრძანება ჩვენს დაჯავშნის სისტემაში. აირჩიეთ სასურველი ოთახი და დაგეგმეთ თქვენი დასვენება მარტივად.</p>
+            <h1>სასტუმრო "{{ hotel.name }}"</h1>
+            <p>კეთილი იყოს თქვენი მობრძანება ჩვენს დაჯავშნის სისტემაში.</p>
+
+            <div class="user-info">
+                <strong>{{ customer.show_booking_summary() }}</strong>
+            </div>
         </section>
 
         <section id="rooms-section">
             <h2>ხელმისაწვდომი ოთახები</h2>
             <div class="rooms-grid">
-                <div class="room-card" id="room-101">
-                    <h3>ოთახი 101</h3>
-                    <p>ტიპი: Single</p>
-                    <p>ფასი: 100.00 GEL</p>
-                    <p>სტატუსი: <span class="status-available">თავისუფალი</span></p>
+                {% for room in hotel.rooms %}
+                <div class="room-card" id="room-{{ room.room_number }}">
+                    <h3>ოთახი {{ room.room_number }}</h3>
+                    <p>ტიპი: {{ room.room_type }}</p>
+                    <p>ფასი: {{ room.price_per_night }} GEL</p>
+                    <p>სტატუსი:
+                        {% if room.is_available %}
+                            <span class="status-available">თავისუფალი</span>
+                        {% else %}
+                            <span class="status-booked">დაკავებული</span>
+                        {% endif %}
+                    </p>
                 </div>
-                <div class="room-card" id="room-102">
-                    <h3>ოთახი 102</h3>
-                    <p>ტიპი: Double</p>
-                    <p>ფასი: 180.00 GEL</p>
-                    <p>სტატუსი: <span class="status-available">თავისუფალი</span></p>
-                </div>
-                <div class="room-card" id="room-103">
-                    <h3>ოთახი 103</h3>
-                    <p>ტიპი: Suite</p>
-                    <p>ფასი: 300.00 GEL</p>
-                    <p>სტატუსი: <span class="status-available">თავისუფალი</span></p>
-                </div>
+                {% endfor %}
             </div>
         </section>
 
         <section id="booking-section">
             <h2>ოთახის დაჯავშნა</h2>
-            <form action="#" method="POST">
+            <form action="/" method="POST">
                 <div class="form-group">
                     <label for="room-select">აირჩიეთ ოთახის ტიპი:</label>
                     <select id="room-select" name="room_type">
-                        <option value="single">Single</option>
-                        <option value="double">Double</option>
-                        <option value="suite">Suite</option>
+                        <option value="Single">Single</option>
+                        <option value="Double">Double</option>
+                        <option value="Suite">Suite</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="days-input">დღეების რაოდენობა:</label>
-                    <input type="number" id="days-input" name="days" min="1" value="1">
+                    <input type="number" id="days-input" name="days" min="1" value="1" required>
                 </div>
                 <div class="form-group">
-                    <label for="budget-input">თქვენი ბიუჯეტი (GEL):</label>
-                    <input type="number" id="budget-input" name="budget" min="0" placeholder="მაგ: 500">
+                    <label for="budget-input">თქვენი მიმდინარე ბიუჯეტი (GEL):</label>
+                    <input type="number" id="budget-input" name="budget" min="0" value="{{ customer.budget }}" required>
                 </div>
                 <button type="submit">დაჯავშნა</button>
             </form>
 
             <div class="booking-status">
-                სისტემის სტატუსი: მზად არის დასაჯავშნად.
+                {{ status_message }}
             </div>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2026 სასტუმროს დაჯავშნის სააგენტო. ყველა უფლება დაცულია.</p>
+        <p>&copy; 2026 სასტუმროს დაჯავშნის სააგენტო.</p>
     </footer>
 
 </body>
